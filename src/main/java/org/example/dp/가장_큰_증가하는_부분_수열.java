@@ -14,16 +14,12 @@ public class 가장_큰_증가하는_부분_수열 {
     public static void main(String[] args) throws IOException {
         init();
 
-
-
         dp[0] = nums[0];
 
         for (int i = 1; i < N; i++) {
             dp[i] = nums[i];
             for (int j = 0; j < i; j++) {
-                if (nums[i] > nums[j]) {
-                    dp[i] = Math.max(dp[i], dp[j]+nums[i]);
-                }
+                if (nums[i] > nums[j]) dp[i] = Math.max(dp[i], dp[j]+nums[i]);
             }
         }
 
