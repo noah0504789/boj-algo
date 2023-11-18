@@ -17,9 +17,11 @@ public class 가장_긴_증가하는_부분_수열_4 {
             return;
         }
 
-        for (int i = 0; i < N; i++) {
+        dp[0] = 1;
+
+        for (int i = 1; i < N; i++) {
             dp[i] = 1;
-            for (int j = 0; j < i; j++) {
+            for (int j = i-1; j >= 0; j--) {
                 if (nums[j] < nums[i] && dp[i] < dp[j] + 1) {
                     dp[i] = dp[j] + 1;
                     path[i] = j;
@@ -27,26 +29,20 @@ public class 가장_긴_증가하는_부분_수열_4 {
             }
         }
 
-        int maxIdx = 0, maxVal = dp[0];
+        int maxIdx = 0;
         for (int k = 1; k < N; k++) {
-            if (dp[k] > dp[k-1]) {
-                maxVal = dp[k];
-                maxIdx = k;
-            }
+            if (dp[k] > dp[maxIdx]) maxIdx = k;
         }
+
+        System.out.println(dp[maxIdx]);
 
         List<Integer> list = new ArrayList<>();
-        while (maxIdx != -1) {
-            list.add(nums[maxIdx]);
-            maxIdx = path[maxIdx];
-        }
-
-        System.out.println(maxVal);
+        for (int i = maxIdx; i != -1; i = path[i]) list.add(nums[i]);
 
         StringBuffer sb = new StringBuffer();
         list.stream().sorted().forEach(n -> sb.append(n).append(' '));
 
-        System.out.println(sb.toString());
+        System.out.println(sb.toString().trim());
     }
 
     private static void init() throws IOException {
