@@ -28,8 +28,8 @@ public class 계단_오르기 {
         dp[1][1] = nums[1];
 
         for (int i = 2; i <= N; i++) {
-            dp[0][i] = dp[1][i-1] + nums[i];
-            dp[1][i] = Math.max(dp[0][i-2], dp[1][i-2]) + nums[i];
+            dp[0][i] = Math.max(dp[0][i-2], dp[1][i-2]) + nums[i];
+            dp[1][i] = dp[0][i-1] + nums[i];
         }
 
         System.out.println(Math.max(dp[0][N], dp[1][N]));
