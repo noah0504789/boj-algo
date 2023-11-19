@@ -11,14 +11,17 @@ public class 연속합 {
     public static void main(String[] args) throws IOException {
         init();
 
-        for (int i = 1; i <= N; i++) {
-            dp[i] = Math.max(0, dp[i-1] + nums[i-1]);
+        int min = Arrays.stream(nums).max().getAsInt();
+        if (min < 0) {
+            System.out.println(min);
+            return;
         }
 
-        int min = Arrays.stream(nums).max().getAsInt();
+        dp[0] = nums[0];
 
-        if (min < 0) System.out.println(min);
-        else System.out.println(Arrays.stream(dp).max().getAsInt());
+        for (int i = 1; i < N; i++) dp[i] = Math.max(0, dp[i-1] + nums[i]);
+
+        System.out.println(Arrays.stream(dp).max().getAsInt());
     }
 
     private static void init() throws IOException {
