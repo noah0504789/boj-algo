@@ -30,10 +30,11 @@ public class 퇴사 {
         int[] dp = new int[N+2];
 
         for (int i = N; i > 0; i--) {
-            // 오늘의 스케쥴을 하는 경우 : dp[day + t[day]] + p[day]
-            // 오늘의 스케쥴을 하지 않는 경우 : dp[day+1]
-            if (i + t[i] > N+1) dp[i] = dp[i+1];
-            else dp[i] = Math.max(dp[i+1], dp[i+t[i]]+p[i]);
+            // 오늘의 스케쥴을 할 수 있는 경우 : dp[day + t[day]] + p[day]
+            // 오늘의 스케쥴을 못하는 경우 : dp[day+1]
+
+            if (i + t[i] >= N+1) dp[i] = Math.max(dp[i+1], dp[i+t[i]]+p[i]);
+            else dp[i] = dp[i+1];
         }
 
         System.out.println(dp[1]);
