@@ -16,7 +16,6 @@ public class 퇴사_2 {
         init();
 
         for (int i = 1; i <= N; i++) {
-            if (i > table.length) break;
             Work work = table[i-1];
 
             if (work.end <= N) dp[work.end] = Math.max(dp[work.end], dp[work.start] + work.profit);
