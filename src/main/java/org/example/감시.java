@@ -1,17 +1,12 @@
 package org.example;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.Collectors;
 
-import static org.example.감시.Type.BIDIRECT_RIGHT_ANGLE;
-import static org.example.감시.Type.BIDIRECT_STRAIGHT;
+import static org.example.감시.Type.*;
 import static org.example.감시.Type.DIR.*;
-import static org.example.감시.Type.DIR;
-import static org.example.감시.Type.QUADIRECT;
-import static org.example.감시.Type.TRIDIRECT;
 
 /**
  * @author noah kim
@@ -38,6 +33,7 @@ import static org.example.감시.Type.TRIDIRECT;
  */
 public class 감시 {
     private static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    private static final List<Long> rotatedBits = new ArrayList<>();
     private static final CCTV[] cctvs = new CCTV[8];
     private static final int EMPTY = 0;
     private static final int UNDIR = 1;
@@ -49,8 +45,8 @@ public class 감시 {
 
     private static StringTokenizer st;
     private static int[][] board;
-    private static long a;
-    private static int N, M, ans, cctvCnt;
+    private static boolean flag;
+    private static int N, M, ans, cctvCnt, wallCnt;
 
     enum Type {
         UNDIRECT(UP, RIGHT, DOWN, LEFT), BIDIRECT_STRAIGHT(LR, UD), BIDIRECT_RIGHT_ANGLE(UR, RD, DL, LU), TRIDIRECT(URD, RDL, DLU, LUR), QUADIRECT(URDL);
@@ -66,7 +62,19 @@ public class 감시 {
         }
 
         enum DIR {
-            UP, RIGHT, DOWN, LEFT, LR, UD, UR, RD, DL, LU, URD, RDL, DLU, LUR, URDL;
+            UP(감시::up), RIGHT(감시::right), DOWN(감시::down), LEFT(감시::left),
+            LR(감시::left, 감시::right), UD(감시::up, 감시::down), UR(감시::up, 감시::right), RD(감시::right, 감시::down), DL(감시::down, 감시::left), LU(감시::left, 감시::up),
+            URD(감시::up, 감시::right, 감시::down), RDL(감시::right, 감시::down, 감시::left), DLU(감시::right, 감시::down, 감시::up), LUR(감시::left, 감시::up, 감시::right),
+            URDL(감시::up, 감시::right, 감시::down, 감시::left);
+            private final LongUnaryOperator[] rotateFuncs;
+
+            DIR(LongUnaryOperator... rFuncs) {
+                this.rotateFuncs = rFuncs;
+            }
+
+            public LongUnaryOperator combinedFunc() {
+                return Arrays.stream(rotateFuncs).reduce(LongUnaryOperator.identity(), LongUnaryOperator::andThen);
+            }
         }
     }
 
@@ -83,13 +91,14 @@ public class 감시 {
             return type.getRotations();
         }
 
-        public long[] rotate(long curBit) {
-            // TODO: type이 가진 회전종류를 모두 가져오고, 종류별로 회전한 후의 결과를 pointNum을 기준값으로 비트마스킹 값으로 반환하기
-            for (DIR dir : getRotations()) {
+        public Long[] rotate(long curBit) {
+            rotatedBits.clear();
 
+            for (LongUnaryOperator rF : getRotations().stream().map(DIR::combinedFunc).toArray(LongUnaryOperator[]::new)) {
+                rotatedBits.add(rF.applyAsLong(curBit));
             }
 
-            return new long[] {1};
+            return rotatedBits.toArray(Long[]::new);
         }
     }
 
@@ -105,13 +114,14 @@ public class 감시 {
             for (int c = 0; c < M; c++) {
                 board[r][c] = Integer.parseInt(st.nextToken());
 
-                int pointNum = r * N + c;
+                int pointNum = r * M + c;
 
-                if (board[r][c] == UNDIR) cctvs[cctvCnt++] = new CCTV(pointNum, Type.UNDIRECT);
+                if (board[r][c] == UNDIR) cctvs[cctvCnt++] = new CCTV(pointNum, UNDIRECT);
                 else if (board[r][c] == BIDIR_STRAIGHT) cctvs[cctvCnt++] = new CCTV(pointNum, BIDIRECT_STRAIGHT);
                 else if (board[r][c] == BIDIR_RIGHT_ANGLE) cctvs[cctvCnt++] = new CCTV(pointNum, BIDIRECT_RIGHT_ANGLE);
                 else if (board[r][c] == TRIDIR) cctvs[cctvCnt++] = new CCTV(pointNum, TRIDIRECT);
                 else if (board[r][c] == QUADIR) cctvs[cctvCnt++] = new CCTV(pointNum, QUADIRECT);
+                else if (board[r][c] == WALL) wallCnt++;
             }
         }
 
@@ -126,13 +136,68 @@ public class 감시 {
 
     private static void dfs(int depth, long curBit) {
         if (depth == cctvCnt) {
-            // TODO : 사각지대 수 계수 및 ans 갱신
+            int cnt = Long.bitCount(curBit);
+            if (cnt == N*M - (cctvCnt+wallCnt)) flag = true;
+            ans = Math.max(ans, cnt);
 
             return;
         }
 
         for (long rotatedBit : cctvs[depth].rotate(curBit)) {
+            if (flag) break;
             dfs(depth+1, rotatedBit);
         }
+    }
+
+    private static long up(long curBit) {
+        int r = (int) (curBit/N), c = (int) (curBit%N);
+
+        while (--r >= 0) {
+            if (board[r][c] == WALL) break;
+            if (board[r][c] != EMPTY) continue;
+
+            curBit |= 1L<<(r*N+c);
+        }
+
+        return curBit;
+    }
+
+    private static long down(long curBit) {
+        int r = (int) (curBit/N), c = (int) (curBit%N);
+
+        while (++r < N) {
+            if (board[r][c] == WALL) break;
+            if (board[r][c] != EMPTY) continue;
+
+            curBit |= 1L<<(r*N+c);
+        }
+
+        return curBit;
+    }
+
+    private static long left(long curBit) {
+        int r = (int) (curBit/N), c = (int) (curBit%N);
+
+        while (--c >= 0) {
+            if (board[r][c] == WALL) break;
+            if (board[r][c] != EMPTY) continue;
+
+            curBit |= 1L<<(r*N+c);
+        }
+
+        return curBit;
+    }
+
+    private static long right(long curBit) {
+        int r = (int) (curBit/N), c = (int) (curBit%N);
+
+        while (++c < M) {
+            if (board[r][c] == WALL) break;
+            if (board[r][c] != EMPTY) continue;
+
+            curBit |= 1L<<(r*N+c);
+        }
+
+        return curBit;
     }
 }
