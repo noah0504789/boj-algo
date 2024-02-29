@@ -3,6 +3,21 @@ package org.example.simulation;
 import java.io.*;
 import java.util.*;
 
+/**
+     [초기셋팅]
+     1. swan
+     - swan arr에 저장
+     - ground 변환
+
+     2. ground
+     - 주변 ground와 union-find로 서로소 집합을 만든다.
+     - 주변에 ice가 있는 땅을 큐에 집어넣는다. (녹이기 위해)
+
+     [빙하 녹이기]
+     - 서로 만날 수 있는지 확인 (서로소 집합을 활용하여 사이클 체크)
+     - ice들을 꺼내서 하나씩 녹이고, 나이를 적는다.
+ */
+
 public class 백조의_호수 {
     // 지구온난화
     private static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -10,13 +25,14 @@ public class 백조의_호수 {
     private static final int[][] DIRS = {{0,1},{0,-1},{1,0},{-1,0}};
     private static final char GROUND = '.';
     private static final char SWAN = 'L';
-    private static final int ICE_NUM = -1;
+    private static final int ICE_INIT_NUM = -1;
     private static final int GROUND_NUM = 0;
     private static StringTokenizer st;
     private static UnionFind unionFind;
     private static int[][] board;
     private static int[] swan = new int[2];
     private static int R, C, swanIdx;
+    private static boolean isSurroundedByIce;
     static class UnionFind {
         final int size;
         int[] root, rank;
@@ -76,25 +92,26 @@ public class 백조의_호수 {
                 } else if (curC == SWAN) {
                     swan[swanIdx++] = pointToNum(r, c);
                     board[r][c] = GROUND_NUM;
-                } else  {
-                    board[r][c] = ICE_NUM;
+                } else {
+                    board[r][c] = ICE_INIT_NUM;
                 }
             }
         }
 
         for (int r = 0; r < R; r++) {
             for (int c = 0; c < C; c++) {
-                if (board[r][c] == ICE_NUM) continue;
+                if (board[r][c] == ICE_INIT_NUM) continue;
 
-                boolean isSurroundedIce = false;
+                isSurroundedByIce = false;
+
                 for (int[] dir : DIRS) {
                     int nr = r+dir[0], nc = c+dir[1];
                     if (nr<0 || nr>=R || nc<0 || nc>=C) continue;
                     if (board[nr][nc] == GROUND_NUM) unionFind.union(pointToNum(r,c), pointToNum(nr,nc));
-                    else isSurroundedIce = true;
+                    else isSurroundedByIce = true;
                 }
 
-                if (isSurroundedIce) queue.add(new int[] {r, c, 0});
+                if (isSurroundedByIce) queue.add(new int[] {r, c, GROUND_NUM});
             }
         }
 
@@ -106,7 +123,7 @@ public class 백조의_호수 {
 
         while (!queue.isEmpty()) {
             int[] point = queue.poll();
-            int r=point[0], c=point[1], dist=point[2];
+            int r=point[0], c=point[1], age=point[2];
 
             for (int[] dir : DIRS) {
                 int nr = r+dir[0], nc = c+dir[1];
@@ -119,9 +136,9 @@ public class 백조의_호수 {
                     return;
                 }
 
-                if (board[nr][nc] != ICE_NUM) continue;
-                board[nr][nc] = dist+1;
-                queue.add(new int[]{nr, nc, dist+1});
+                if (board[nr][nc] != ICE_INIT_NUM) continue;
+                board[nr][nc] = age+1;
+                queue.add(new int[]{nr, nc, age+1});
             }
         }
     }
