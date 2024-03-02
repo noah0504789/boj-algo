@@ -1,11 +1,8 @@
-package org.example;
-
-import java.io.IOException;
-import java.util.Arrays;
+package org.example.greedy;
 
 // reference @qlenfrl0577
 
-public class 공주님의_정원2 {
+public class 공주님의_정원_T4 {
     static int[] days = {0,31,28,31,30,31,30,31,31,30,31,30,31};
 
     public static void main(String[] args) throws Exception {

@@ -1,11 +1,11 @@
-package org.example;
+package org.example.greedy;
 
 import java.io.*;
 import java.util.*;
 
 import static java.util.Comparator.comparing;
 
-public class 공주님의_정원 {
+public class 공주님의_정원_T3 {
     private static final int curYear = 2024;
     private static Calendar start = Calendar.getInstance(), end = Calendar.getInstance(), s = Calendar.getInstance(), e = Calendar.getInstance(), cur = Calendar.getInstance();
     static {
