@@ -1,11 +1,11 @@
-package org.example;
+package org.example.simulation;
 
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
 
-import static org.example.감시_실패.Type.*;
-import static org.example.감시_실패.Type.DIR.*;
+import static org.example.simulation.감시_실패.Type.*;
+import static org.example.simulation.감시_실패.Type.DIR.*;
 
 /**
  * @author noah kim
@@ -41,7 +41,6 @@ public class 감시_실패 {
     private static final int QUADIR = 5;
     private static final int WALL = 6;
 
-    private static StringTokenizer st;
     private static int[][] board;
     private static boolean flag;
     private static int N, M, ans, cctvCnt, wallCnt;
@@ -60,10 +59,10 @@ public class 감시_실패 {
         }
 
         enum DIR {
-            UP(감시_::up), RIGHT(감시_::right), DOWN(감시_::down), LEFT(감시_::left),
-            LR(감시_::left, 감시_::right), UD(감시_::up, 감시_::down), UR(감시_::up, 감시_::right), RD(감시_::right, 감시_::down), DL(감시_::down, 감시_::left), LU(감시_::left, 감시_::up),
-            URD(감시_::up, 감시_::right, 감시_::down), RDL(감시_::right, 감시_::down, 감시_::left), DLU(감시_::right, 감시_::down, 감시_::up), LUR(감시_::left, 감시_::up, 감시_::right),
-            URDL(감시_::up, 감시_::right, 감시_::down, 감시_::left);
+            UP(감시_실패::up), RIGHT(감시_실패::right), DOWN(감시_실패::down), LEFT(감시_실패::left),
+            LR(감시_실패::left, 감시_실패::right), UD(감시_실패::up, 감시_실패::down), UR(감시_실패::up, 감시_실패::right), RD(감시_실패::right, 감시_실패::down), DL(감시_실패::down, 감시_실패::left), LU(감시_실패::left, 감시_실패::up),
+            URD(감시_실패::up, 감시_실패::right, 감시_실패::down), RDL(감시_실패::right, 감시_실패::down, 감시_실패::left), DLU(감시_실패::right, 감시_실패::down, 감시_실패::up), LUR(감시_실패::left, 감시_실패::up, 감시_실패::right),
+            URDL(감시_실패::up, 감시_실패::right, 감시_실패::down, 감시_실패::left);
             private final LongUnaryOperator[] rotateFuncs;
 
             DIR(LongUnaryOperator... rFuncs) {
