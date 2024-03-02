@@ -3,10 +3,9 @@ package org.example;
 import java.io.*;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 
-import static org.example.감시.Type.*;
-import static org.example.감시.Type.DIR.*;
+import static org.example.감시_실패.Type.*;
+import static org.example.감시_실패.Type.DIR.*;
 
 /**
  * @author noah kim
@@ -31,8 +30,7 @@ import static org.example.감시.Type.DIR.*;
  * @time_complex
  * @perf
  */
-public class 감시 {
-    private static final BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+public class 감시_실패 {
     private static final List<Long> rotatedBits = new ArrayList<>();
     private static final CCTV[] cctvs = new CCTV[8];
     private static final int EMPTY = 0;
@@ -62,10 +60,10 @@ public class 감시 {
         }
 
         enum DIR {
-            UP(감시::up), RIGHT(감시::right), DOWN(감시::down), LEFT(감시::left),
-            LR(감시::left, 감시::right), UD(감시::up, 감시::down), UR(감시::up, 감시::right), RD(감시::right, 감시::down), DL(감시::down, 감시::left), LU(감시::left, 감시::up),
-            URD(감시::up, 감시::right, 감시::down), RDL(감시::right, 감시::down, 감시::left), DLU(감시::right, 감시::down, 감시::up), LUR(감시::left, 감시::up, 감시::right),
-            URDL(감시::up, 감시::right, 감시::down, 감시::left);
+            UP(감시_::up), RIGHT(감시_::right), DOWN(감시_::down), LEFT(감시_::left),
+            LR(감시_::left, 감시_::right), UD(감시_::up, 감시_::down), UR(감시_::up, 감시_::right), RD(감시_::right, 감시_::down), DL(감시_::down, 감시_::left), LU(감시_::left, 감시_::up),
+            URD(감시_::up, 감시_::right, 감시_::down), RDL(감시_::right, 감시_::down, 감시_::left), DLU(감시_::right, 감시_::down, 감시_::up), LUR(감시_::left, 감시_::up, 감시_::right),
+            URDL(감시_::up, 감시_::right, 감시_::down, 감시_::left);
             private final LongUnaryOperator[] rotateFuncs;
 
             DIR(LongUnaryOperator... rFuncs) {
@@ -103,16 +101,15 @@ public class 감시 {
     }
 
     public static void main(String[] args) throws IOException {
-        st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
+        N = readInt();
+        M = readInt();
 
         board = new int[N][M];
+        long initBit = 0;
 
         for (int r = 0; r < N; r++) {
-            st = new StringTokenizer(br.readLine());
             for (int c = 0; c < M; c++) {
-                board[r][c] = Integer.parseInt(st.nextToken());
+                board[r][c] = readInt();
 
                 int pointNum = r * M + c;
 
@@ -125,13 +122,9 @@ public class 감시 {
             }
         }
 
-        long init = 0;
-
-        dfs(0, init);
+        dfs(0, initBit);
 
         System.out.println(ans);
-
-        br.close();
     }
 
     private static void dfs(int depth, long curBit) {
@@ -149,55 +142,63 @@ public class 감시 {
         }
     }
 
-    private static long up(long curBit) {
-        int r = (int) (curBit/N), c = (int) (curBit%N);
+    private static long up(long stateBit) {
+        int r = (int) (stateBit/N), c = (int) (stateBit%N);
 
         while (--r >= 0) {
             if (board[r][c] == WALL) break;
             if (board[r][c] != EMPTY) continue;
 
-            curBit |= 1L<<(r*N+c);
+            stateBit |= 1L<<(r*N+c);
         }
 
-        return curBit;
+        return stateBit;
     }
 
-    private static long down(long curBit) {
-        int r = (int) (curBit/N), c = (int) (curBit%N);
-
-        while (++r < N) {
-            if (board[r][c] == WALL) break;
-            if (board[r][c] != EMPTY) continue;
-
-            curBit |= 1L<<(r*N+c);
-        }
-
-        return curBit;
-    }
-
-    private static long left(long curBit) {
-        int r = (int) (curBit/N), c = (int) (curBit%N);
-
-        while (--c >= 0) {
-            if (board[r][c] == WALL) break;
-            if (board[r][c] != EMPTY) continue;
-
-            curBit |= 1L<<(r*N+c);
-        }
-
-        return curBit;
-    }
-
-    private static long right(long curBit) {
-        int r = (int) (curBit/N), c = (int) (curBit%N);
+    private static long right(long stateBit) {
+        int r = (int) (stateBit/N), c = (int) (stateBit%N);
 
         while (++c < M) {
             if (board[r][c] == WALL) break;
             if (board[r][c] != EMPTY) continue;
 
-            curBit |= 1L<<(r*N+c);
+            stateBit |= 1L<<(r*N+c);
         }
 
-        return curBit;
+        return stateBit;
+    }
+
+    private static long down(long stateBit) {
+        int r = (int) (stateBit/N), c = (int) (stateBit%N);
+
+        while (++r < N) {
+            if (board[r][c] == WALL) break;
+            if (board[r][c] != EMPTY) continue;
+
+            stateBit |= 1L<<(r*N+c);
+        }
+
+        return stateBit;
+    }
+
+    private static long left(long stateBit) {
+        int r = (int) (stateBit/N), c = (int) (stateBit%N);
+
+        while (--c >= 0) {
+            if (board[r][c] == WALL) break;
+            if (board[r][c] != EMPTY) continue;
+
+            stateBit |= 1L<<(r*N+c);
+        }
+
+        return stateBit;
+    }
+
+    private static int readInt() throws IOException {
+        int c, n = System.in.read() & (1<<4)-1;
+        while ((c = System.in.read()) > (1<<5)) {
+            n = (n<<1) + (n<<3) + (c&(1<<4)-1);
+        }
+        return n;
     }
 }
