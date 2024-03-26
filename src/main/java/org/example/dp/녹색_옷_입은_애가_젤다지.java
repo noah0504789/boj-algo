@@ -83,7 +83,7 @@ public class 녹색_옷_입은_애가_젤다지 {
                 if (nr < 0 || nr >= N || nc < 0 || nc >= N) continue;
 
                 int newD = toStopoverD + map[nr][nc];
-                if (newD > minDists[nr][nc]) continue;
+                if (newD >= minDists[nr][nc]) continue;
 
                 minDists[nr][nc] = newD;
                 edges.offer(new Edge(nr, nc, newD));
@@ -92,9 +92,9 @@ public class 녹색_옷_입은_애가_젤다지 {
     }
 
     public static int readInt() throws IOException {
-        int c, n = System.in.read() & ((1<<4)-1);
+        int c, n = System.in.read() & (1<<4)-1;
         while ((c = System.in.read()) > (1<<5)) {
-            n = n<<1 + n<<3 + (c&(1<<4)-1);
+            n = (n<<1) + (n<<3) + (c&(1<<4)-1);
         }
         return n;
     }
