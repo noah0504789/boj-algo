@@ -38,7 +38,7 @@ public class 맥주_마시면서_걸어가기 {
     private static final int perDist = 50;
     private static final int dist = cap*perDist;
     private static Point[] nodes;
-    private static boolean[] visited;
+    private static BitSet visBit = new BitSet();
     private static int tc, n;
 
     static class Point {
@@ -80,8 +80,8 @@ public class 맥주_마시면서_걸어가기 {
 
     private static boolean bfs() {
         Point src = nodes[0], dest = nodes[n+1];
-        visited = new boolean[n+2];
-        visited[0] = true;
+        visBit.clear();
+        visBit.set(0);
 
         queue.clear();
         queue.offer(src);
@@ -91,9 +91,10 @@ public class 맥주_마시면서_걸어가기 {
             if (cur.getManhattenDist(dest) <= dist) return true;
 
             for (int i = 1; i < n+1; i++) {
-                if (visited[i]) continue;
+                if (visBit.get(i)) continue;
+
                 if (cur.getManhattenDist(nodes[i]) > dist) continue;
-                visited[i] = true;
+                visBit.set(i);
                 queue.offer(nodes[i]);
             }
         }
