@@ -1,4 +1,4 @@
-package org.example.hashtable;
+package org.example.hash;
 
 import java.io.*;
 import java.util.*;
