@@ -1,4 +1,4 @@
-package org.example.permutation;
+package org.example.math.permutation;
 
 import java.io.*;
 import java.util.Arrays;
